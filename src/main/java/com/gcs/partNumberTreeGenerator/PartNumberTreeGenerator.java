@@ -27,7 +27,7 @@ public class PartNumberTreeGenerator {
 
         List<Node<PartNumber>> trees = createTree(partNumberStringToNode, parentChildList);
 
-        RootNodeWithNodeToOpen foundTreeWithNode = findInNodes("1", trees);
+        RootNodeWithNodeToOpen foundTreeWithNode = findInTrees("1", trees);
 
         if(foundTreeWithNode!=null && foundTreeWithNode.getRootNode() != null){
             drawTree(foundTreeWithNode.getRootNode(), foundTreeWithNode.getNodeToOpen());
@@ -67,11 +67,11 @@ public class PartNumberTreeGenerator {
         return new Node<>(partNumber);
     }
 
-    private static RootNodeWithNodeToOpen findInNodes(String partNumberString, List<Node<PartNumber>> rootNode) {
-        for (Node<PartNumber> partNumberNode : rootNode) {
-            Node<PartNumber> foundNode = findInNode(partNumberString, partNumberNode);
+    private static RootNodeWithNodeToOpen findInTrees(String partNumberString, List<Node<PartNumber>> rootNodes) {
+        for (Node<PartNumber> rootNode : rootNodes) {
+            Node<PartNumber> foundNode = findInNode(partNumberString, rootNode);
             if (foundNode != null) {
-                return new RootNodeWithNodeToOpen(partNumberNode, foundNode);
+                return new RootNodeWithNodeToOpen(rootNode, foundNode);
             }
         }
         return null;
