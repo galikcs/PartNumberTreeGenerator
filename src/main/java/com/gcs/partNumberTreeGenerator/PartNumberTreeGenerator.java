@@ -27,7 +27,7 @@ public class PartNumberTreeGenerator {
 
         List<Node<PartNumber>> trees = createTree(partNumberStringToNode, parentChildList);
 
-        RootNodeWithNodeToOpen foundTreeWithNode = findInNodes("9", trees);
+        RootNodeWithNodeToOpen foundTreeWithNode = findInNodes("1", trees);
 
         if(foundTreeWithNode!=null && foundTreeWithNode.getRootNode() != null){
             drawTree(foundTreeWithNode.getRootNode(), foundTreeWithNode.getNodeToOpen());

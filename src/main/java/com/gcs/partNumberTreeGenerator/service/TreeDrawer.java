@@ -2,30 +2,27 @@ package com.gcs.partNumberTreeGenerator.service;
 
 import com.gcs.partNumberTreeGenerator.model.Node;
 import com.gcs.partNumberTreeGenerator.model.PartNumber;
-import org.apache.commons.compress.utils.Lists;
+import com.gcs.partNumberTreeGenerator.custom.CustomTreeCellRenderer;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class TreeDrawer implements TreeSelectionListener {
 
     private final Node<PartNumber> nodeToDraw;
-    private final Node<PartNumber> nodeToOpen;
+    private final Node<PartNumber> nodeToDisplay;
     private final JFrame frame;
     private JTree partNumberTree;
     private TreePath nodeToOpenTreePath;
 
     public TreeDrawer(Node<PartNumber> nodeToDraw, Node<PartNumber> nodeToOpen) {
         this.nodeToDraw = nodeToDraw;
-        this.nodeToOpen = nodeToOpen;
+        this.nodeToDisplay = nodeToOpen;
         frame = new JFrame("Partnumber Tree");
     }
 
@@ -42,6 +39,7 @@ public class TreeDrawer implements TreeSelectionListener {
         }
 
         frame.add(partNumberTree);
+        partNumberTree.setCellRenderer(new CustomTreeCellRenderer(nodeToDisplay));
 
         frame.setSize(800, 800);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -67,7 +65,7 @@ public class TreeDrawer implements TreeSelectionListener {
         for (Node<PartNumber> childNode : childrenNodes) {
             DefaultMutableTreeNode childTreeNode = new DefaultMutableTreeNode(childNode.getData());
             rootTreeNode.add(childTreeNode);
-            if(childNode == nodeToOpen){
+            if(childNode == nodeToDisplay){
                 //nodeToOpenTreePath = new TreePath(childTreeNode.getPath());
                 nodeToOpenTreePath = new TreePath(rootTreeNode.getPath());
             }
