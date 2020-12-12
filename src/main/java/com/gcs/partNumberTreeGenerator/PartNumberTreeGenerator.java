@@ -1,9 +1,6 @@
 package com.gcs.partNumberTreeGenerator;
 
-import com.gcs.partNumberTreeGenerator.model.ExcelPartNumberParentChild;
-import com.gcs.partNumberTreeGenerator.model.ExcelContent;
-import com.gcs.partNumberTreeGenerator.model.Node;
-import com.gcs.partNumberTreeGenerator.model.PartNumber;
+import com.gcs.partNumberTreeGenerator.model.*;
 import com.gcs.partNumberTreeGenerator.service.ExcelReader;
 import com.gcs.partNumberTreeGenerator.service.TreeDrawer;
 
@@ -30,15 +27,15 @@ public class PartNumberTreeGenerator {
 
         List<Node<PartNumber>> trees = createTree(partNumberStringToNode, parentChildList);
 
-        Node<PartNumber> foundNode = findInNodes("4", trees);
+        RootNodeWithNodeToOpen foundTreeWithNode = findInNodes("9", trees);
 
-        if(foundNode != null){
-            drawTree(foundNode);
+        if(foundTreeWithNode!=null && foundTreeWithNode.getRootNode() != null){
+            drawTree(foundTreeWithNode.getRootNode(), foundTreeWithNode.getNodeToOpen());
         }
     }
 
-    private static void drawTree(Node<PartNumber> nodeToDraw) {
-        TreeDrawer treeDrawer = new TreeDrawer(nodeToDraw);
+    private static void drawTree(Node<PartNumber> rootNodeToDraw, Node<PartNumber> nodeToOpen) {
+        TreeDrawer treeDrawer = new TreeDrawer(rootNodeToDraw, nodeToOpen);
         treeDrawer.drawTree();
     }
 
@@ -70,11 +67,11 @@ public class PartNumberTreeGenerator {
         return new Node<>(partNumber);
     }
 
-    private static Node<PartNumber> findInNodes(String partNumberString, List<Node<PartNumber>> rootNode) {
+    private static RootNodeWithNodeToOpen findInNodes(String partNumberString, List<Node<PartNumber>> rootNode) {
         for (Node<PartNumber> partNumberNode : rootNode) {
             Node<PartNumber> foundNode = findInNode(partNumberString, partNumberNode);
             if (foundNode != null) {
-                return partNumberNode;
+                return new RootNodeWithNodeToOpen(partNumberNode, foundNode);
             }
         }
         return null;
