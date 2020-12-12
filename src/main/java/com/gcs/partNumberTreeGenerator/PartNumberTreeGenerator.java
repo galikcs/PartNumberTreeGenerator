@@ -10,15 +10,16 @@ import java.util.stream.Collectors;
 public class PartNumberTreeGenerator {
 
     public static void main(String[] args) {
-        // write your code here
 
         System.out.println("Hello");
 
         ExcelReader reader = new ExcelReader();
         ExcelContent excelData = reader.readFile("e:\\PartNumbers\\PartNumbers.xlsx");
         List<ExcelPartNumberParentChild> parentChildList = excelData.getParentChildList();
+        List<ExcelPartNumberStatus> partNumberStatusList = excelData.getPartNumberStatuses();
+        Map<String, String> partNumberToStatus = partNumberStatusList.stream().collect(Collectors.toMap(ExcelPartNumberStatus::getPartNumber, ExcelPartNumberStatus::getStatus));
 
-        Set<Node<PartNumber>> nodes = parentChildList.stream().map(PartNumberTreeGenerator::createNode).collect(Collectors.toSet());
+        Set<Node<PartNumber>> nodes = parentChildList.stream().map(node -> createNode(node, partNumberToStatus)).collect(Collectors.toSet());
 
         Map<String, Node<PartNumber>> partNumberStringToNode = new HashMap<>();
         for (Node<PartNumber> node : nodes) {
@@ -27,7 +28,7 @@ public class PartNumberTreeGenerator {
 
         List<Node<PartNumber>> trees = createTree(partNumberStringToNode, parentChildList);
 
-        RootNodeWithNodeToOpen foundTreeWithNode = findInTrees("1", trees);
+        RootNodeWithNodeToOpen foundTreeWithNode = findInTrees("9", trees);
 
         if(foundTreeWithNode!=null && foundTreeWithNode.getRootNode() != null){
             drawTree(foundTreeWithNode.getRootNode(), foundTreeWithNode.getNodeToOpen());
@@ -58,11 +59,12 @@ public class PartNumberTreeGenerator {
         return mainList;
     }
 
-    private static Node<PartNumber> createNode(ExcelPartNumberParentChild parentChildLink) {
+    private static Node<PartNumber> createNode(ExcelPartNumberParentChild parentChildLink, Map<String, String> partNumberToStatus) {
 
         String partNumberString = parentChildLink.getChild();
+        String status = partNumberToStatus.get(partNumberString);
 
-        PartNumber partNumber = new PartNumber(partNumberString, null);
+        PartNumber partNumber = new PartNumber(partNumberString, status);
 
         return new Node<>(partNumber);
     }

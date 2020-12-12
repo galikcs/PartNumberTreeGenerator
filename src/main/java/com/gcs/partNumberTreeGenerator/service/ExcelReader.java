@@ -2,6 +2,7 @@ package com.gcs.partNumberTreeGenerator.service;
 
 import com.gcs.partNumberTreeGenerator.model.ExcelPartNumberParentChild;
 import com.gcs.partNumberTreeGenerator.model.ExcelContent;
+import com.gcs.partNumberTreeGenerator.model.ExcelPartNumberStatus;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -21,15 +22,18 @@ public class ExcelReader {
     public ExcelContent readFile(String fileName) {
 
         List<ExcelPartNumberParentChild> partNumberParentChildrenList = new ArrayList<>();
+        List<ExcelPartNumberStatus> partNumberStatuses = new ArrayList<>();
 
         File excelFile = new File(fileName);
         XSSFSheet partNumberParentChildSheet;
+        XSSFSheet partNumberStatusesSheet;
         FileInputStream fis;
         XSSFWorkbook workbook;
         try {
             fis = new FileInputStream(excelFile);
             workbook = new XSSFWorkbook(fis);
             partNumberParentChildSheet = workbook.getSheetAt(0);
+            partNumberStatusesSheet = workbook.getSheetAt(1);
         } catch (FileNotFoundException e) {
             System.out.println("File not found: " + fileName);
             throw new RuntimeException(e);
@@ -46,17 +50,37 @@ public class ExcelReader {
 
                 Iterator<Cell> cellIterator = row.cellIterator();
 
-                Cell parentCell = cellIterator.next();
+                Cell childCell = cellIterator.next();
                 DataFormatter df = new DataFormatter();
-                String child = df.formatCellValue(parentCell);
+                String child = df.formatCellValue(childCell);
                 String parent = null;
                 if(cellIterator.hasNext()) {
-                    Cell childCell = cellIterator.next();
-                    parent = df.formatCellValue(childCell);
+                    Cell paretnCell = cellIterator.next();
+                    parent = df.formatCellValue(paretnCell);
                 }
 
                 ExcelPartNumberParentChild partNumberParentChild = new ExcelPartNumberParentChild(parent, child);
                 partNumberParentChildrenList.add(partNumberParentChild);
+            }
+        }
+
+        if (partNumberStatusesSheet != null){
+            Iterator<Row> rowIt = partNumberStatusesSheet.iterator();
+
+            while(rowIt.hasNext()){
+                Row row = rowIt.next();
+                Iterator<Cell> cellIterator = row.cellIterator();
+
+                Cell partNumberCell = cellIterator.next();
+                DataFormatter df = new DataFormatter();
+                String partNumber = df.formatCellValue(partNumberCell);
+                String status = null;
+                if(cellIterator.hasNext()){
+                    Cell statusCell = cellIterator.next();
+                    status = df.formatCellValue(statusCell);
+                }
+                ExcelPartNumberStatus partNumberStatus = new ExcelPartNumberStatus(partNumber, status);
+                partNumberStatuses.add(partNumberStatus);
             }
         }
 
@@ -67,7 +91,7 @@ public class ExcelReader {
             System.out.println("Error in closing files");
             throw new RuntimeException(e);
         }
-        return new ExcelContent(partNumberParentChildrenList);
+        return new ExcelContent(partNumberParentChildrenList, partNumberStatuses);
     }
 
 }

@@ -6,9 +6,9 @@ public class PartNumber {
 
     private final String partNumber;
 
-    private final Integer status;
+    private final String status;
 
-    public PartNumber(String partNumber, Integer status){
+    public PartNumber(String partNumber, String status){
         this.partNumber = partNumber;
         this.status = status;
     }
@@ -18,7 +18,7 @@ public class PartNumber {
     }
 
 
-    public Integer getStatus() {
+    public String getStatus() {
         return status;
     }
 
